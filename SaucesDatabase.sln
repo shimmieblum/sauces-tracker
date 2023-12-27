@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sauces.Api", "src\Sauces.Api\Sauces.Api.csproj", "{2273FA37-0AC7-41F3-8774-1ED93DEE0C4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A017B673-40D5-4B1D-9FC2-58C1076B7FA1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{50CA224E-E8E6-4117-8C53-A2A4243E0731}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sauces.Core", "Sauces.Core\Sauces.Core.csproj", "{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2273FA37-0AC7-41F3-8774-1ED93DEE0C4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2273FA37-0AC7-41F3-8774-1ED93DEE0C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2273FA37-0AC7-41F3-8774-1ED93DEE0C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2273FA37-0AC7-41F3-8774-1ED93DEE0C4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2273FA37-0AC7-41F3-8774-1ED93DEE0C4B} = {A017B673-40D5-4B1D-9FC2-58C1076B7FA1}
+		{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3} = {A017B673-40D5-4B1D-9FC2-58C1076B7FA1}
+	EndGlobalSection
+EndGlobal
