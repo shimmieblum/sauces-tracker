@@ -4,6 +4,7 @@ public class Sauce
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public SauceRecipe Recipe { get; set; }
+    public FermentationRecipeAsIngredient Fermentation { get; set; }
+    public List<RecipeIngredient> NonFermentedIngredients { get; set; }
     public string Notes { get; set; }
 }
