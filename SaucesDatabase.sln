@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A017B673-40D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{50CA224E-E8E6-4117-8C53-A2A4243E0731}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sauces.Core", "Sauces.Core\Sauces.Core.csproj", "{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sauces.Core", "src\Sauces.Core\Sauces.Core.csproj", "{85506C0A-9A7B-4E8E-9F3A-E3763C6592D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
