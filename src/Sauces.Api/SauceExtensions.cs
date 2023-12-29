@@ -7,17 +7,18 @@ namespace Sauces.Api;
 public static class SauceExtensions
 {
     public static IQueryable<Sauce> IncludeEverything(this DbSet<Sauce> sauces)
-    => sauces
+        => sauces
             .Include(r => r.Fermentation)
-            .ThenInclude(f => f.FermentationRecipe)
-            .ThenInclude(f => f.Ingredients)
-            .ThenInclude(i => i.Ingredient)
+                .ThenInclude(f => f.FermentationRecipe)
+                    .ThenInclude(f => f.Ingredients)
+                        .ThenInclude(i => i.Ingredient)
             .Include(r => r.NonFermentedIngredients)
-            .ThenInclude(n => n.Ingredient)
-            .Include(s => s);
+                .ThenInclude(n => n.Ingredient);
 
     public static IQueryable<FermentationRecipe> IncludeEverything(this DbSet<FermentationRecipe> fermentationRecipes)
-        => fermentationRecipes.Include(r => r.Ingredients).ThenInclude(i => i.Ingredient);
+        => fermentationRecipes
+            .Include(r => r.Ingredients)
+            .ThenInclude(i => i.Ingredient);
         
     public static string GetLoggingString(this Sauce sauce)
     {

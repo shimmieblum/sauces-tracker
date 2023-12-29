@@ -24,22 +24,26 @@ public static class FermentationHandlers
             LengthInDays = recipe.LengthInDays
         };
 
-    private static async Task<IResult> PostFermentationHandler(ISaucesRepository sauceRepository, [FromBody] FermentationRecipeRequest fermentationRecipeRequest)
+    private static async Task<IResult> PostFermentationHandler(
+        IFermentationRecipeRepository fermentationRecipeRepository, 
+        [FromBody] FermentationRecipeRequest fermentationRecipeRequest)
     {
-        var id = await sauceRepository.AddFermentationRecipe(fermentationRecipeRequest) ;
+        var id = await fermentationRecipeRepository.AddFermentationRecipe(fermentationRecipeRequest) ;
         return id is null ? BadRequest("failed to add fermentation recipe") : Ok(id);
     }
 
-    private static async Task<IResult> GetFermentationsHandler(ISaucesRepository sauceRepository)
+    private static async Task<IResult> GetFermentationsHandler(IFermentationRecipeRepository fermentationRecipeRepository)
     {
-        var recipes = await sauceRepository.GetFermentationRecipes();
+        var recipes = await fermentationRecipeRepository.GetFermentationRecipes();
         var response = recipes.Select(r => r.ToResponse());
         return Ok(response); 
     }
 
-    private static async Task<IResult> GetFermentationHandler(ISaucesRepository saucesRepository, [FromRoute] Guid id)
+    private static async Task<IResult> GetFermentationHandler(
+        IFermentationRecipeRepository fermentationRecipeRepository, 
+        [FromRoute] Guid id)
     {
-        var recipe = await saucesRepository.GetFermentationRecipe(id);
+        var recipe = await fermentationRecipeRepository.GetFermentationRecipe(id);
         return recipe is null 
             ? NotFound($"No Fermentation with id {id} found") 
             : Ok(recipe.ToResponse());

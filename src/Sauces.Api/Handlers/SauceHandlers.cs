@@ -11,7 +11,7 @@ public static class SauceHandlers
     public static RouteGroupBuilder MapSauceApi(this RouteGroupBuilder app)
     {
         app.MapGet("", GetSaucesHandler);
-        app.MapGet("{guid:id}", GetSauceHandler);
+        app.MapGet("/{id:guid}", GetSauceHandler);
         app.MapPost("", PostSauceHandler);
 
         return app;
