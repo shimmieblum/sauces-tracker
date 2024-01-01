@@ -1,4 +1,5 @@
-import Image from 'next/image'
+import React from "react";
+import { SaucesComponent } from "@/app/Components/SaucesComponent";
 
 export default function Home() {
   return (
