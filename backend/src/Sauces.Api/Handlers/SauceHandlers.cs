@@ -22,11 +22,22 @@ public static class SauceHandlers
         {
             Id = sauce.Id,
             Name = sauce.Name,
-            Fermentation = sauce.Fermentation.FermentationRecipe?.Ingredients
-                .ToDictionary(i => i.Ingredient.Name, i => i.Percentage) ?? new Dictionary<string, int>(),
+            Fermentation = new() 
+            {
+                Ingredients = sauce.Fermentation.FermentationRecipe.Ingredients
+                    .Select(i => new IngredientsModel{
+                        
+                            Ingredient = i.Ingredient.Name, Percentage = i.Percentage
+                    }).ToArray(),
+                lengthInDays  = sauce.Fermentation.FermentationRecipe.LengthInDays
+            },
             FermentationPercentage = sauce.Fermentation.Percentage,
             NonFermentedIngredients =
-                sauce.NonFermentedIngredients.ToDictionary(i => i.Ingredient.Name, i => i.Percentage),
+                sauce.NonFermentedIngredients.Select( i => new IngredientsModel
+                {
+                    Ingredient = i.Ingredient.Name,
+                    Percentage = i.Percentage
+                }).ToArray(),
             Notes = sauce.Notes
         };
 

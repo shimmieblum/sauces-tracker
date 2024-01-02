@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Sauces.Api.Models;
 using Sauces.Api.Repositories;
 using Sauces.Core.Model;
 using static Microsoft.AspNetCore.Http.Results;
@@ -20,7 +21,10 @@ public static class FermentationHandlers
         => new()
         {
             Id = recipe.Id,
-            Ingredients = recipe.Ingredients.ToDictionary(i => i.Ingredient.Name, i => i.Percentage),
+            Ingredients = recipe.Ingredients.Select(i => new IngredientsModel
+            {
+                Ingredient = i.Ingredient.Name, Percentage = i.Percentage
+            }).ToArray(),
             LengthInDays = recipe.LengthInDays
         };
 
