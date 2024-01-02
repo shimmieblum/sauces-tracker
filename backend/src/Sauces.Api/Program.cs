@@ -14,11 +14,16 @@ builder.Services
         new LoggerConfiguration().WriteTo.Console().CreateLogger()))
     .AddTransient<ISaucesRepository, SauceRepository>()
     .AddTransient<IFermentationRepository, FermentationRepository>()
-    .AddDbContext<SaucesContext>( 
+    .AddDbContext<SaucesContext>(
         opts => opts.UseNpgsql(configManager.GetConnectionString("SaucesDB")), 
         ServiceLifetime.Transient);
 
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(builder => builder.AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader()));
+
 var app = builder.Build();
+
+app.UseCors();
 app.MapGet("", () => "welcome to the sauces stuff!!!");
 
 app.MapGroup("/fermentations").MapFermentationApi();
