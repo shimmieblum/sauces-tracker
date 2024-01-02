@@ -11,14 +11,22 @@ public class SauceResponse
     public string Name { get; set; }
     
     [JsonPropertyName("fermentation")]
-    public Dictionary<string, int> Fermentation { get; set; }
+    public Fermentation Fermentation { get; set; }
 
     [JsonPropertyName("fermentationPercentage")]
     public int FermentationPercentage { get; set; }
     
     [JsonPropertyName("nonFermentedIngredients")]
-    public Dictionary<string, int>? NonFermentedIngredients { get; set; }
+    public IngredientsModel[] NonFermentedIngredients { get; set; }
 
     [JsonPropertyName("notes")]
     public string Notes { get; set; }
+}
+
+public class Fermentation {
+    [JsonPropertyName("ingredients")]
+    public IngredientsModel[] Ingredients { get; set;}
+
+    [JsonPropertyName("lengthInDays")]
+    public int lengthInDays { get; set; }
 }
