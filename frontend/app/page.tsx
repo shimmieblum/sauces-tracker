@@ -1,5 +1,5 @@
 import React from "react";
-import { SaucesComponent } from "@/app/Components/SaucesComponent";
+import { SaucesComponent } from "./SaucesComponent";
 
 export default function Home() {
   return (
