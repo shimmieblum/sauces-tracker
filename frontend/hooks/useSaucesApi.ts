@@ -5,7 +5,7 @@ import {TraceEntryPointsPlugin} from "next/dist/build/webpack/plugins/next-trace
 
 const baseUrl = 'http://localhost:5268/sauces'
 export const useGetSauces = () => {
-  const [ isLoading, setIsLoading] = useState(false);
+  const [ isLoading, setIsLoading] = useState(true);
   const GetSauces = async () => { 
     try{
       setIsLoading(true);
@@ -22,7 +22,7 @@ export const useGetSauces = () => {
 }
 
 export const useDeleteSauce = (id:string) => {
-  const [ isDeleting, setIsDeleting ] = useState(false);
+  const [ isDeleting, setIsDeleting ] = useState(true);
   const deleteSauce = async () => {
     try {
       setIsDeleting(true);
