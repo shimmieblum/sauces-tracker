@@ -1,13 +1,13 @@
 'use client';
 
-import {Sauce} from "../models/SauceSchema";
+import {SauceResponse} from "../../models/SauceResponseSchema";
 import {Alert, Card, CardActions, CardContent, IconButton, Typography} from "@mui/material";
 import React, {useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete"
-import {useDeleteSauce} from "../hooks/useSaucesApi";
+import {useDeleteSauce} from "../../hooks/useSaucesApi";
 import {Snackbar} from "@mui/base";
 
-export const SauceCardComponent  = ({sauce}: {sauce:Sauce}) => {
+export const SauceCardComponent  = ({sauce}: {sauce:SauceResponse}) => {
   const { deleteSauce, isDeleting } = useDeleteSauce(sauce.id);
   const [deleteSuccess, setDeleteSuccess]  = useState<boolean | undefined>();
   const [deleteFailed, setDeleteFailed] = useState<boolean | undefined>();
@@ -20,7 +20,12 @@ export const SauceCardComponent  = ({sauce}: {sauce:Sauce}) => {
   const ingredientString = `fermentation (${fermentationString}), ${otherIngredientsString})`;
   return (
     <>
-      <Card>
+      <Card sx={{
+        maxHeight: 200, 
+        minHeight: 100,
+        height: 200,
+        margin: 2
+      }}>
         <CardContent>
           <Typography gutterBottom variant='h5' component='div'>{sauce.name}</Typography>
           <Typography variant='body2' color='text.secondary'>{ingredientString}</Typography>

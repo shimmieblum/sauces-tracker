@@ -56,12 +56,11 @@ public class FermentationRepository(SaucesContext dbContext) : IFermentationRepo
     
     private FermentationRecipe ToRecipe(FermentationRecipeRequest request, Guid id)
     {
-        var ingredients = request.Ingredients.Select(kv =>
+        var ingredients = request.Ingredients.Select(entry =>
         {
-            var (ingredientName, percentage) = kv;
-            var ingredient = dbContext.Ingredients.Find(ingredientName)
-                             ?? dbContext.Ingredients.Add(new Ingredient{Name = ingredientName}).Entity;
-            return new RecipeIngredient{ Ingredient = ingredient, Percentage = percentage};
+            var ingredient = dbContext.Ingredients.Find(entry.Ingredient)
+                             ?? dbContext.Ingredients.Add(new Ingredient{Name = entry.Ingredient}).Entity;
+            return new RecipeIngredient{ Ingredient = ingredient, Percentage = entry.Percentage};
         }).ToList();
 
         return new FermentationRecipe

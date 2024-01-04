@@ -13,6 +13,7 @@ public static class SauceHandlers
         app.MapGet("", GetSaucesHandler);
         app.MapGet("/{id:guid}", GetSauceHandler);
         app.MapPost("", PostSauceHandler);
+        app.MapPost("/with-fermentation", PostSauceWithFermentationHandler);
 
         return app;
     }
@@ -62,5 +63,29 @@ public static class SauceHandlers
     {
         var id = await saucesRepository.CreateAsync(request);
         return id is null ? BadRequest("failed to add sauce") : Ok(id);
+    }
+
+    private static async Task<IResult> PostSauceWithFermentationHandler(
+        ISaucesRepository saucesRepository,
+        IFermentationRepository fermentationRepository,
+        [FromBody] SauceWithFermentationRequest request)
+    {
+        var fermentation = request.Fermentation;
+        var fermentationId =  await fermentationRepository.CreateAsync(fermentation);
+        if (fermentationId is null)
+        {
+            return BadRequest("failure creating fermentation");
+        }
+
+        var sauceRequest = new SauceRequest
+        {
+            Name = request.Name,
+            Fermentation = fermentationId.Value,
+            FermentationPercentage = request.FermentationPercentage,
+            NonFermentedIngredients = request.NonFermentedIngredients,
+            Notes = request.Notes
+        };
+        
+        return await PostSauceHandler(saucesRepository, sauceRequest);
     }
 }
