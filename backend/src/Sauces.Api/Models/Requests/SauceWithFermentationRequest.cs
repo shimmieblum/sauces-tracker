@@ -2,13 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace Sauces.Api.Models;
 
-public class SauceRequest
+public class SauceWithFermentationRequest
 {
+    
     [JsonPropertyName("name")]
     public string Name { get; set; }
     
     [JsonPropertyName("fermentation")]
-    public Guid Fermentation { get; set; }
+    public FermentationRecipeRequest Fermentation { get; set; }
 
     [JsonPropertyName("fermentationPercentage")]
     public int FermentationPercentage { get; set; }

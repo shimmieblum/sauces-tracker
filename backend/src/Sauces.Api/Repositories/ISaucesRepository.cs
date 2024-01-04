@@ -75,14 +75,13 @@ public class SauceRepository(SaucesContext dbContext) : ISaucesRepository
                 FermentationRecipe = fermentation,
                 Percentage = request.FermentationPercentage
             },
-            NonFermentedIngredients = request.NonFermentedIngredients.Select(kv =>
+            NonFermentedIngredients = request.NonFermentedIngredients.Select(entry =>
             {
-                var (ingredientName, percentage) = kv;
-                var ingredient = dbContext.Ingredients.Find(ingredientName)
-                                 ?? dbContext.Add(new Ingredient{Name = ingredientName}).Entity;
+                var ingredient = dbContext.Ingredients.Find(entry.Ingredient)
+                                 ?? dbContext.Add(new Ingredient{Name = entry.Ingredient}).Entity;
                 return new RecipeIngredient
                 {
-                    Ingredient = ingredient, Percentage = percentage
+                    Ingredient = ingredient, Percentage = entry.Percentage
                 };
             }).ToList(),
             Notes = request.Notes
