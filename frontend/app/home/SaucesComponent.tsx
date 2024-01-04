@@ -1,13 +1,13 @@
 'use client'
 
-import { Sauce } from "../models/SauceSchema";
+import { SauceResponse } from "../../models/SauceResponseSchema";
 import { useEffect, useState } from "react";
-import { useGetSauces } from '../hooks/useSaucesApi';
+import { useGetSauces } from '../../hooks/useSaucesApi';
 import {SauceCardComponent} from "./SauceCardComponent";
 import {Grid} from "@mui/material";
 
 export const SaucesComponent = () => {
-  const [sauces, setSauces] = useState<Sauce[] | undefined>();
+  const [sauces, setSauces] = useState<SauceResponse[] | undefined>();
   const { GetSauces, isLoading } = useGetSauces();
   useEffect(() => {
     (async () => {
@@ -24,9 +24,9 @@ export const SaucesComponent = () => {
   }
 
   return(
-    <Grid container style={{padding: 20}} spacing={2}>
+    <Grid container style={{padding: '100px 50px'}} spacing={2}>
       {sauces.map(s => 
-        <Grid xs={3}>
+        <Grid xs={3} >
           <SauceCardComponent sauce={s}/>
         </Grid>
       )}
