@@ -9,12 +9,6 @@ import AddIcon from '@mui/icons-material/Add'
 import {redirect, RedirectType} from "next/navigation";
 
 
-const darkTheme = createTheme({
-  palette:{
-    mode: 'light',
-  }
-});
-
 
 const AddNewSauceButton = () =>  {
   return <Chip
