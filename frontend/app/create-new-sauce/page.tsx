@@ -7,7 +7,7 @@ import {NewSauceForm} from "./newSauceForm";
 
 export default function Home() {
   return (
-    <Box className=" min-h-screen items-center justify-between p-24">
+    <Box color={'black'} className=" min-h-screen items-center justify-between p-24">
       <HeaderComponent/>
       <NewSauceForm/>
     </Box>

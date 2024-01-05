@@ -6,6 +6,7 @@ import React, {useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete"
 import {useDeleteSauce} from "../../hooks/useSaucesApi";
 import {Snackbar} from "@mui/base";
+import {ResponseSnackBars} from "../sharedComponents/ResponseSnackBars";
 
 export const SauceCardComponent  = ({sauce}: {sauce:SauceResponse}) => {
   const { deleteSauce, isDeleting } = useDeleteSauce(sauce.id);
@@ -15,9 +16,8 @@ export const SauceCardComponent  = ({sauce}: {sauce:SauceResponse}) => {
     return true;
   }
   
-  const fermentationString  = sauce.fermentation.ingredients.map(i => i.ingredient).join(', ');
-  const otherIngredientsString = sauce.nonFermentedIngredients.map(i => i.ingredient).join(', ');
-  const ingredientString = `fermentation (${fermentationString}), ${otherIngredientsString})`;
+  const fermentationString  = `fermentation (${sauce.fermentationPercentage}%): ${sauce.fermentation.ingredients.map(i => i.ingredient).join(', ')}`;
+  const otherIngredientsString = `other ingredients: (${100 - sauce.fermentationPercentage}%): ${sauce.nonFermentedIngredients.map(i => i.ingredient).join(', ')}`;
   return (
     <>
       <Card sx={{
@@ -28,7 +28,8 @@ export const SauceCardComponent  = ({sauce}: {sauce:SauceResponse}) => {
       }}>
         <CardContent>
           <Typography gutterBottom variant='h5' component='div'>{sauce.name}</Typography>
-          <Typography variant='body2' color='text.secondary'>{ingredientString}</Typography>
+          <Typography variant='body2' color='text.secondary'>{fermentationString}</Typography>
+          <Typography variant='body2' color='text.secondary'>{otherIngredientsString}</Typography>
         </CardContent>  
         <CardActions>
           <IconButton 
@@ -43,28 +44,14 @@ export const SauceCardComponent  = ({sauce}: {sauce:SauceResponse}) => {
           </IconButton>
         </CardActions>
       </Card>
-      <Snackbar
-        open={deleteSuccess ?? false}
-        style={{
-          minWidth: 'fit-content',
-          padding: '10px 0px'
-        }}
-        autoHideDuration={3000}
-        onClose={() => setDeleteSuccess(undefined)}
-      >
-        <Alert severity={'success'}>
-          {`deleted ${sauce.name} sauce`}
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={deleteFailed ?? false}
-        autoHideDuration={6000}
-        onClose={() => setDeleteFailed(undefined)}
-      >
-        <Alert severity='error'>
-          {`deletion of ${sauce.name} sauce failed`}
-        </Alert>
-      </Snackbar>
+      <ResponseSnackBars
+        isGood={deleteSuccess} 
+        setGood={setDeleteSuccess}
+        goodMessage={`successfully deleted ${sauce.name}`}
+        isBad={deleteFailed}
+        setBad={setDeleteFailed}
+        badMessage={`failed to delete ${sauce.name}`}
+      />
     </>
   );
 }
