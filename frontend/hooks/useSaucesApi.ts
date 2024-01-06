@@ -24,15 +24,15 @@ export const useGetSauces = () => {
   return {isLoading, GetSauces};
 }
 
-export const useDeleteSauce = (id:string) => {
-  const [ isDeleting, setIsDeleting ] = useState(true);
-  const deleteSauce = async () => {
+export const useDeleteSauce = () => {
+  const [ isDeleting, setIsDeleting ] = useState(false);
+  const deleteSauce = async (id:string) => {
     try {
       setIsDeleting(true);
       const endpoint = `${baseUrl}/${id}`;
       const response = await axios.delete(endpoint);
       setIsDeleting(false);
-      return response.status === axios.HttpStatusCode.NoContent;
+      return response.status === axios.HttpStatusCode.Ok;
     }
     catch (err){
       console.error(err, {message: `error occured trying to delete sauce id=${id}`})

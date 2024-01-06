@@ -10,10 +10,11 @@ public static class SauceHandlers
 {
     public static RouteGroupBuilder MapSauceApi(this RouteGroupBuilder app)
     {
-        app.MapGet("", GetSaucesHandler);
-        app.MapGet("/{id:guid}", GetSauceHandler);
-        app.MapPost("", PostSauceHandler);
-        app.MapPost("/with-fermentation", PostSauceWithFermentationHandler);
+        app.MapGet("", GetAllHandler);
+        app.MapGet("/{id:guid}", GetOneHandler);
+        app.MapPost("", PostHandler);
+        app.MapPost("/with-fermentation", PostWithFermentationHandler);
+        app.MapDelete("/{id:guid}", DeleteHandler);
 
         return app;
     }
@@ -42,14 +43,14 @@ public static class SauceHandlers
             Notes = sauce.Notes
         };
 
-    private static async Task<IResult> GetSaucesHandler(ISaucesRepository saucesRepository)
+    private static async Task<IResult> GetAllHandler(ISaucesRepository saucesRepository)
     {
         var sauces = await saucesRepository.GetAsync();
         var sauceResponses = sauces.Select(s => s.ToSauceResponse());
         return Ok(sauceResponses);
     }
 
-    private static async Task<IResult> GetSauceHandler(ISaucesRepository saucesRepository, [FromRoute] Guid id)
+    private static async Task<IResult> GetOneHandler(ISaucesRepository saucesRepository, [FromRoute] Guid id)
     {
         var sauce = await saucesRepository.GetAsync(id);
         
@@ -58,14 +59,14 @@ public static class SauceHandlers
             : Ok(sauce.ToSauceResponse());
     }
 
-    private static async Task<IResult> PostSauceHandler(
+    private static async Task<IResult> PostHandler(
         ISaucesRepository saucesRepository, [FromBody] SauceRequest request)
     {
         var id = await saucesRepository.CreateAsync(request);
         return id is null ? BadRequest("failed to add sauce") : Ok(id);
     }
 
-    private static async Task<IResult> PostSauceWithFermentationHandler(
+    private static async Task<IResult> PostWithFermentationHandler(
         ISaucesRepository saucesRepository,
         IFermentationRepository fermentationRepository,
         [FromBody] SauceWithFermentationRequest request)
@@ -86,6 +87,12 @@ public static class SauceHandlers
             Notes = request.Notes
         };
         
-        return await PostSauceHandler(saucesRepository, sauceRequest);
+        return await PostHandler(saucesRepository, sauceRequest);
+    }
+
+    private static async Task<IResult> DeleteHandler(ISaucesRepository repository, [FromRoute] Guid id)
+    {
+        var sauce = await repository.DeleteAsync(id);
+        return sauce is not null ? Ok(sauce) : NotFound($"sauce with id ${id} not found");
     }
 }
