@@ -6,6 +6,7 @@ import {useDeleteSauce, useGetSauces} from '../../hooks/useSaucesApi';
 import {SauceCardComponent} from "./SauceCardComponent";
 import {Grid} from "@mui/material";
 import {ResponseSnackBars} from "../sharedComponents/ResponseSnackBars";
+import {base} from "next/dist/build/webpack/config/blocks/base";
 
 export const SaucesComponent = () => {
   const [sauces, setSauces] = useState<SauceResponse[] | undefined>();
@@ -13,7 +14,6 @@ export const SaucesComponent = () => {
   const [deleteFailed, setDeleteFailed] = useState<boolean>();
   const [deleteSuccessMessage, setDeleteSuccessMsg] = useState('');
   const [deleteFailedMessage, setDeleteFailedMsg] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const { deleteSauce, isDeleting } = useDeleteSauce();
   const { GetSauces, isLoading } = useGetSauces();
   
@@ -31,8 +31,10 @@ export const SaucesComponent = () => {
     return <> Something went wrong.... </>
   }
   
-  
   const handleDeleteSauce = (s:SauceResponse) => {
+    const baseMsg = `deletion of ${s.name} sauce`;
+    setDeleteFailedMsg(baseMsg + ' failed' );
+    setDeleteSuccessMsg(baseMsg + ' succeeded' )
     deleteSauce(s.id).then(r => {
       if(!r) {
         setDeleteFailed(true)

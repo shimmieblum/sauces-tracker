@@ -22,7 +22,7 @@ export const SauceCardComponent  = ({sauce, handleDelete}: {sauce:SauceResponse,
   const [ showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const fermentationString  = `fermentation (${sauce.fermentationPercentage}%): ${sauce.fermentation.ingredients.map(i => i.ingredient).join(', ')}`;
   const otherIngredientsString = `other ingredients: (${100 - sauce.fermentationPercentage}%): ${sauce.nonFermentedIngredients.map(i => i.ingredient).join(', ')}`;
-  
+  const handleDeleteClick = () => setShowDeleteConfirmation(true);
   return (
     <>
       <Card sx={{
@@ -39,8 +39,7 @@ export const SauceCardComponent  = ({sauce, handleDelete}: {sauce:SauceResponse,
         <CardActions>
           <IconButton 
             aria-label='delete'
-            // disabled={true} // disabled for now until the endpoint is fixed
-            onClick={() => setShowDeleteConfirmation(true)}
+            onClick={handleDeleteClick}
           >
             <DeleteIcon/>
           </IconButton>
