@@ -7,8 +7,6 @@ import {IngredientsInput} from "./inputs/IngredientsInput";
 import {Ingredient} from "../../models/IngredientSchema";
 import {TextFieldInput, NumberFieldInput} from "./inputs/FieldInputs";
 import {ResponseSnackBars} from "../sharedComponents/ResponseSnackBars";
-import {SettingsInputSvideo} from "@mui/icons-material";
-import isExportFrom from "sucrase/dist/types/util/isExportFrom";
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -48,7 +46,6 @@ export const NewSauceForm = () => {
   const [fermentationPercentage, setFermentationPercentage] = useState(0);
   const [name, setName] = useState('');
   const [notes, setNotes] = useState('');
-  const [fermentationIngredients, setFermentationIngredients] = useState<Ingredient[]>([{ingredient: '', percentage: 0}]);
   const [nonFermentedIngredients, setNonFermentedIngredients] = useState<Ingredient[]>([{ingredient: '', percentage: 0}]);
   const [createSuccess, setCreateSuccess] = useState<boolean | undefined>()
   const [createFailed, setCreateFailed] = useState<boolean | undefined>()
@@ -85,7 +82,7 @@ export const NewSauceForm = () => {
         <Typography margin='20px' variant='h4'>
           CREATE NEW SAUCE
         </Typography>
-        <TextFieldInput title='name' setValueFn={setName}/>
+        <TextFieldInput title='name' setValueFn={setName} autoFocus/>
         <FermentationRecipeInput 
           setFermentationFn={setFermentation}
         />

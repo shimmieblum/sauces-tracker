@@ -1,4 +1,4 @@
-import {TextField} from "@mui/material";
+import {TextField, TextFieldProps} from "@mui/material";
 import {makeStyles} from "@mui/styles";
 
 const useStyles = makeStyles(theme => ({
@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const TextFieldInput = ({title, setValueFn, required=true, multiline=false}: {
+export const TextFieldInput = ({title, setValueFn, required=true, multiline=false, ...props}: TextFieldProps&{
   title:string,
   setValueFn: (val:string) => void,
   required?:boolean,
@@ -25,6 +25,7 @@ export const TextFieldInput = ({title, setValueFn, required=true, multiline=fals
     onChange={(e) => setValueFn(e.target.value)}
     className={classes.textField}
     multiline={multiline}
+    {...props}
   />
 }
 
