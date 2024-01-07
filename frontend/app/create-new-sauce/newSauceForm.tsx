@@ -7,10 +7,18 @@ import {IngredientsInput} from "./inputs/IngredientsInput";
 import {Ingredient} from "../../models/IngredientSchema";
 import {TextFieldInput, NumberFieldInput} from "./inputs/FieldInputs";
 import {ResponseSnackBars} from "../sharedComponents/ResponseSnackBars";
-import {SettingsInputSvideo} from "@mui/icons-material";
-import isExportFrom from "sucrase/dist/types/util/isExportFrom";
 
 const useStyles = makeStyles((theme) => ({
+  submitSuccessBox: {
+    margin: "auto",
+    width: '50%',
+    maxWidth: '90%',
+    minWidth: 'fit-content',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   form: {
     margin: "auto",
     width: '50%',
@@ -48,7 +56,6 @@ export const NewSauceForm = () => {
   const [fermentationPercentage, setFermentationPercentage] = useState(0);
   const [name, setName] = useState('');
   const [notes, setNotes] = useState('');
-  const [fermentationIngredients, setFermentationIngredients] = useState<Ingredient[]>([{ingredient: '', percentage: 0}]);
   const [nonFermentedIngredients, setNonFermentedIngredients] = useState<Ingredient[]>([{ingredient: '', percentage: 0}]);
   const [createSuccess, setCreateSuccess] = useState<boolean | undefined>()
   const [createFailed, setCreateFailed] = useState<boolean | undefined>()
@@ -72,44 +79,63 @@ export const NewSauceForm = () => {
         setCreateFailed(!success)
         if(!success) {
           console.log('failed to create new sauce')
+          return;
         }
+        setFormSubmitted(true);
       })
       .catch(err => console.error(err, {message: `error occurred creating sauce`}));
     event.preventDefault();
-    setFormSubmitted(true);
+  }
+  
+  const FormSubmitted = () => {
+    return (
+    <Box className={classes.submitSuccessBox} component='div'>
+      <Typography variant='h4' color={'white'}>
+        Sauce submitted successfully
+      </Typography>
+      <Button
+        variant='contained'
+        color='primary' 
+        onClick={() => setFormSubmitted(false)}>
+        Create another? 
+      </Button>
+    </Box>);
   }
   
   return (
     <>
-      <Box className={classes.form} component='form' onSubmit={handleSubmit}>
-        <Typography margin='20px' variant='h4'>
-          CREATE NEW SAUCE
-        </Typography>
-        <TextFieldInput title='name' setValueFn={setName}/>
-        <FermentationRecipeInput 
-          setFermentationFn={setFermentation}
-        />
-        <NonFermentedIngredientsInput 
-          setIngredients={setNonFermentedIngredients} 
-          ingredients={nonFermentedIngredients} 
-          setFermentedPercentage={setFermentationPercentage}
-        />
-        <TextFieldInput multiline required={false} title={'notes'} setValueFn={setNotes}/>
-        <Button 
-          className={classes.button} 
-          variant='contained' 
-          color='primary' 
-          type='submit'
-        >
-          Create Sauce
-        </Button>
-      </Box>
+      {isFormSubmitted 
+        ? <FormSubmitted /> 
+        : <Box className={classes.form} component='form' onSubmit={handleSubmit}>
+          <Typography margin='20px' variant='h4'>
+            CREATE NEW SAUCE
+          </Typography>
+          <TextFieldInput title='name' setValueFn={setName} autoFocus/>
+          <FermentationRecipeInput 
+            setFermentationFn={setFermentation}
+          />
+          <NonFermentedIngredientsInput 
+            setIngredients={setNonFermentedIngredients} 
+            ingredients={nonFermentedIngredients} 
+            setFermentedPercentage={setFermentationPercentage}
+          />
+          <TextFieldInput multiline required={false} title={'notes'} setValueFn={setNotes}/>
+          <Button 
+            className={classes.button} 
+            variant='contained' 
+            color='primary' 
+            type='submit'
+          >
+            Create Sauce
+          </Button>
+        </Box>
+      }
       <ResponseSnackBars
         isGood={createSuccess}
         setGood={setCreateSuccess}
         goodMessage={'successfully created sauce'}
         isBad={createFailed} setBad={setCreateFailed}
-        badMessage={'failed to create sauce'} 
+        badMessage={'failed to create sauce'}
       />
     </>
   );

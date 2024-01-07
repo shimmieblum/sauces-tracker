@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import {TextField, Button, Grid, Box, Icon, IconButton, Card, Paper, Typography} from '@mui/material';
+import React, {createRef, RefObject, useRef} from 'react';
+import {TextField, Grid, Box, IconButton, Typography} from '@mui/material';
 import {makeStyles} from "@mui/styles";
 import MinusIcon from '@mui/icons-material/Remove'
 import AddIcon from "@mui/icons-material/Add";
@@ -34,14 +34,22 @@ export const IngredientsInput = (props: {
 }) => {
   const classes = useStyles();
   const {entries, setEntries, title} = props;
+  const entriesRef = useRef<Array<RefObject<HTMLInputElement>>>([]);
+  if(entriesRef.current.length !== entries.length){
+    entriesRef.current = entries.map(_ => createRef<HTMLInputElement>())
+  }
   const addRow = () => {
-    setEntries([...entries, { ingredient: '', percentage: 0 }]);
+    const updatedEntries = [...entries, { ingredient: '', percentage: 0 }]; 
+    setEntries(updatedEntries);
   };
 
   const removeRow = (index: number) => {
     const newEntries = [...entries];
     newEntries.splice(index, 1);
     setEntries(newEntries);
+    if(index > 0 && entriesRef.current[index - 1].current){
+      entriesRef.current[index - 1].current?.focus();
+    }
   };
 
   const handleInputChange = (index: number, ingredient: string, percentage: number) => {
@@ -49,6 +57,7 @@ export const IngredientsInput = (props: {
     newEntries[index] = { ingredient: ingredient, percentage:percentage };
     setEntries(newEntries);
   };
+  
   
   return (
     <Box component={'div'} className={classes.gridBox}>
@@ -60,8 +69,15 @@ export const IngredientsInput = (props: {
           <Grid item xs={8}>
             <TextField
               label="Ingredient"
+              inputRef={entriesRef.current[index]}
               value={entry.ingredient}
               onChange={(e) => handleInputChange(index, e.target.value, entry.percentage)}
+              onKeyDown={k => {
+                if( ['Backspace', 'Delete'].includes(k.key) && !entry.ingredient) {
+                  removeRow(index);
+                }
+              }}
+              autoFocus={index == entries.length - 1}
               fullWidth
             />
           </Grid>
@@ -72,6 +88,12 @@ export const IngredientsInput = (props: {
               value={entry.percentage}
               onChange={(e) => handleInputChange(index, entry.ingredient, parseInt(e.target.value))}
               fullWidth
+              onKeyDown={(k) => {
+                if (index === entries.length - 1 && k.key === 'Tab') {
+                  k.preventDefault();
+                  addRow();
+                }
+              }}
             />
           </Grid>
           {index == entries.length - 1 ?
@@ -93,13 +115,15 @@ export const IngredientsInput = (props: {
           size='small'
           color="primary"
           className={classes.button}
-          onClick={addRow}
+          onClick={() => {
+            addRow()
+          }
+        }
         >
           <AddIcon/>
         </IconButton>  
       </Box>
     </Box>
-
   );
 };
 
