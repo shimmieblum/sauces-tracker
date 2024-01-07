@@ -89,9 +89,10 @@ export const IngredientsInput = (props: {
               onChange={(e) => handleInputChange(index, entry.ingredient, parseInt(e.target.value))}
               fullWidth
               onKeyDown={(k) => {
-                if (index === entries.length - 1 && k.key === 'Tab')
+                if (index === entries.length - 1 && k.key === 'Tab') {
                   k.preventDefault();
                   addRow();
+                }
               }}
             />
           </Grid>
