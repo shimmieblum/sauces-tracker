@@ -1,10 +1,7 @@
 import {useState} from "react"
 import axios from 'axios';
 import {SauceResponse, SauceSchema} from "../models/SauceResponseSchema";
-import {TraceEntryPointsPlugin} from "next/dist/build/webpack/plugins/next-trace-entrypoints-plugin";
 import {SauceRequest} from "../models/SauceRequestSchema";
-import {Task} from "@mui/icons-material";
-import {end} from "@popperjs/core";
 
 const baseUrl = 'http://localhost:5268/sauces'
 export const useGetSauces = () => {
@@ -22,6 +19,22 @@ export const useGetSauces = () => {
     }
   };
   return {isLoading, GetSauces};
+}
+
+export const useGetSauce = () => {
+  const [loading, setLoading] = useState(true);
+  const getSauce = async (id:string ) => {
+    setLoading(true);
+    try {
+      const response = await axios.get<SauceResponse>(`${baseUrl}/${id}`);
+      setLoading(false);
+      return SauceSchema.parse(response.data);
+    }
+    catch (err){
+      console.error(err, { message: `error getting sauce with id:'${id}'`});
+    }
+  }
+  return {getSauce, loading};
 }
 
 export const useDeleteSauce = () => {
@@ -46,13 +59,13 @@ export const useCreateSauce = () => {
   const createSauce = async (request:SauceRequest) => {
     try {
       const endpoint = `${baseUrl}/with-fermentation`;
-      const response = await axios.post(endpoint, request);
+      const response = await axios.post<string>(endpoint, request);
       console.log(response);
-      return response.status === axios.HttpStatusCode.Ok;
+      return response.status === axios.HttpStatusCode.Ok ? response.data : null;
     }
     catch (err){
       console.error(err, {message: `error creating sauce ${request.name}`})
-      return false;
+      return null;
     }
   }
   
