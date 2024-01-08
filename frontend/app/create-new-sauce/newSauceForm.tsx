@@ -7,6 +7,8 @@ import {IngredientsInput} from "./inputs/IngredientsInput";
 import {Ingredient} from "../../models/IngredientSchema";
 import {TextFieldInput, NumberFieldInput} from "./inputs/FieldInputs";
 import {ResponseSnackBars} from "../sharedComponents/ResponseSnackBars";
+import {BuildTwoTone} from "@mui/icons-material";
+import {useRouter} from "next/navigation";
 
 const useStyles = makeStyles((theme) => ({
   submitSuccessBox: {
@@ -56,10 +58,12 @@ export const NewSauceForm = () => {
   const [fermentationPercentage, setFermentationPercentage] = useState(0);
   const [name, setName] = useState('');
   const [notes, setNotes] = useState('');
+  const [sauceId, setSauceId] = useState('');
   const [nonFermentedIngredients, setNonFermentedIngredients] = useState<Ingredient[]>([{ingredient: '', percentage: 0}]);
   const [createSuccess, setCreateSuccess] = useState<boolean | undefined>()
   const [createFailed, setCreateFailed] = useState<boolean | undefined>()
   const [isFormSubmitted, setFormSubmitted] = useState(false);
+  const router = useRouter();
   const handleSubmit = (event:FormEvent<HTMLFormElement>) => {
     if(!fermentation){
       console.error(`no fermentation defined`);
@@ -74,17 +78,22 @@ export const NewSauceForm = () => {
       fermentationPercentage: fermentationPercentage
     }
     createSauce(sauce)
-      .then(success => {
-        setCreateSuccess(success)
-        setCreateFailed(!success)
-        if(!success) {
+      .then(id => {
+        setCreateSuccess(Boolean(id))
+        setCreateFailed(!id)
+        if(!id) {
           console.log('failed to create new sauce')
           return;
         }
+        setSauceId(id)
         setFormSubmitted(true);
       })
       .catch(err => console.error(err, {message: `error occurred creating sauce`}));
     event.preventDefault();
+  }
+  
+  const navigateToSauce = () => {
+    router.push(`/sauces/${sauceId}`)
   }
   
   const FormSubmitted = () => {
@@ -94,14 +103,22 @@ export const NewSauceForm = () => {
         Sauce submitted successfully
       </Typography>
       <Button
+        className={classes.button}
         variant='contained'
         color='primary' 
         onClick={() => setFormSubmitted(false)}>
         Create another? 
       </Button>
+      <Button
+        className={classes.button}
+        variant='contained'
+        color='primary'
+        onClick={navigateToSauce}
+       >
+        Go to Sauce
+      </Button>
     </Box>);
   }
-  
   return (
     <>
       {isFormSubmitted 
