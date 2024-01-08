@@ -7,6 +7,7 @@ import {SauceCardComponent} from "./SauceCardComponent";
 import {Grid} from "@mui/material";
 import {ResponseSnackBars} from "../sharedComponents/ResponseSnackBars";
 import {base} from "next/dist/build/webpack/config/blocks/base";
+import {NotFound} from "../sharedComponents/NotFound";
 
 export const SaucesComponent = () => {
   const [sauces, setSauces] = useState<SauceResponse[] | undefined>();
@@ -24,11 +25,11 @@ export const SaucesComponent = () => {
     })();}, []);
 
   if(isLoading){
-    return <> Loading... </>
+    return <> </>
   }
 
   if(!sauces){
-    return <> Something went wrong.... </>
+    return <NotFound> Something went wrong.... </NotFound>
   }
   
   const handleDeleteSauce = (s:SauceResponse) => {
@@ -49,7 +50,7 @@ export const SaucesComponent = () => {
   return(
     <Grid container style={{padding: '100px 50px'}} spacing={2}>
       {sauces.map(s => 
-        <Grid xs={3} >
+        <Grid xs={12} sm={6} lg={3} xl={2}>
           <SauceCardComponent sauce={s} handleDelete={handleDeleteSauce}/>
         </Grid>
       )}

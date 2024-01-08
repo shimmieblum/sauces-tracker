@@ -1,11 +1,11 @@
-
 import {SauceResponse} from "../../models/SauceResponseSchema";
 import {
-  Alert, Button,
+  Button,
   Card,
   CardActions,
   CardContent,
-  Dialog, DialogActions,
+  Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
@@ -13,26 +13,34 @@ import {
 } from "@mui/material";
 import React, {useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete"
-import {useDeleteSauce} from "../../hooks/useSaucesApi";
-import {Snackbar} from "@mui/base";
-import {ResponseSnackBars} from "../sharedComponents/ResponseSnackBars";
+import {useRouter} from "next/navigation";
 
 export const SauceCardComponent  = ({sauce, handleDelete}: {sauce:SauceResponse, handleDelete: (sauce:SauceResponse) => void}) => {
   
   const [ showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const fermentationString  = `fermentation (${sauce.fermentationPercentage}%): ${sauce.fermentation.ingredients.map(i => i.ingredient).join(', ')}`;
   const otherIngredientsString = `other ingredients: (${100 - sauce.fermentationPercentage}%): ${sauce.nonFermentedIngredients.map(i => i.ingredient).join(', ')}`;
+  const router = useRouter();
   const handleDeleteClick = () => setShowDeleteConfirmation(true);
+  const navigateToSauce = () => router.push(`sauces/${sauce.id}`);
   return (
     <>
-      <Card sx={{
-        maxHeight: 200, 
-        minHeight: 100,
-        height: 200,
-        margin: 2
-      }}>
+      <Card 
+        sx={{
+          maxHeight: 200, 
+          minHeight: 100,
+          height: 200,
+          minWidth: 'fit-content',
+          margin: 2,
+        }}
+      >
         <CardContent>
-          <Typography gutterBottom variant='h5' component='div'>{sauce.name}</Typography>
+          <Typography
+            sx={{
+              cursor: 'pointer'
+            }}
+            onClick={navigateToSauce}
+            gutterBottom variant='h5' component='div'>{sauce.name}</Typography>
           <Typography variant='body2' color='text.secondary'>{fermentationString}</Typography>
           <Typography variant='body2' color='text.secondary'>{otherIngredientsString}</Typography>
         </CardContent>  
