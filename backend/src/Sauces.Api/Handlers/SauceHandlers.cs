@@ -40,7 +40,9 @@ public static class SauceHandlers
                     Ingredient = i.Ingredient.Name,
                     Percentage = i.Percentage
                 }).ToArray(),
-            Notes = sauce.Notes
+            Notes = sauce.Notes,
+            Created = sauce.Created,
+            LastUpdated = sauce.LastUpdated
         };
 
     private static async Task<IResult> GetAllHandler(ISaucesRepository saucesRepository)
@@ -72,7 +74,7 @@ public static class SauceHandlers
         [FromBody] SauceWithFermentationRequest request)
     {
         var fermentation = request.Fermentation;
-        var fermentationId =  await fermentationRepository.CreateAsync(fermentation);
+        var fermentationId = await fermentationRepository.CreateAsync(fermentation);
         if (fermentationId is null)
         {
             return BadRequest("failure creating fermentation");

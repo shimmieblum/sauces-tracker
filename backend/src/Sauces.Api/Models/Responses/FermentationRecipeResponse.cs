@@ -11,4 +11,10 @@ public class FermentationRecipeResponse
     
     [JsonPropertyName("lengthInDays")]
     public int LengthInDays { get; set; }
+    
+    [JsonPropertyName("lastUpdated")]
+    public DateTime LastUpdated { get; set; }
+    
+    [JsonPropertyName("Created")]
+    public DateTime Created { get; set; }
 }
