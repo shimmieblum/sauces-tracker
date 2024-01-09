@@ -25,7 +25,9 @@ public static class FermentationHandlers
             {
                 Ingredient = i.Ingredient.Name, Percentage = i.Percentage
             }).ToArray(),
-            LengthInDays = recipe.LengthInDays
+            LengthInDays = recipe.LengthInDays,
+            LastUpdated = recipe.LastUpdate,
+            Created = recipe.Created
         };
 
     private static async Task<IResult> PostFermentationHandler(

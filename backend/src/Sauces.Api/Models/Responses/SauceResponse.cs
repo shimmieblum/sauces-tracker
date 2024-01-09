@@ -21,6 +21,12 @@ public class SauceResponse
 
     [JsonPropertyName("notes")]
     public string Notes { get; set; }
+    
+    [JsonPropertyName("lastUpdated")]
+    public DateTime LastUpdated { get; set; }
+    
+    [JsonPropertyName("Created")]
+    public DateTime Created { get; set; }
 }
 
 public class Fermentation {

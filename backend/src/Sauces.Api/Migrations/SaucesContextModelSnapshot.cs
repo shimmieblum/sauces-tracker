@@ -28,6 +28,12 @@ namespace Sauces.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastUpdate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("LengthInDays")
                         .HasColumnType("integer");
 
@@ -101,13 +107,19 @@ namespace Sauces.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("Created")
+                        .HasMaxLength(50)
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("FermentationId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Notes")
                         .IsRequired()
