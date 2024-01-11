@@ -44,21 +44,25 @@ export const SauceComponent = ({sauce} : {sauce:SauceResponse}) => {
   const [notes, setNotes] = useState(sauce.notes);
   const classes = useStyle();
   
+  const headers = ['Ingredients', '%']
   const IngredientsTable = ({ingredients}:{ingredients: Ingredient[] | undefined}) => (
     <Box margin={4} >
       <TableContainer component={Paper}>
         <Table sx={{minWidth: 'fit-content'}}>
           <TableHead >
             <TableRow >
-              <TableCell>Ingredient</TableCell>
-              <TableCell align='right'>%</TableCell>
+              <TableCell>
+                <Typography variant='h6'>
+                  Ingredient
+                </Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {ingredients?.map((i,index) => (
               <TableRow key={index}>
                 <TableCell>{i.ingredient}</TableCell>
-                <TableCell align={'right'}>{i.percentage}</TableCell>
+                <TableCell align={'right'}>{i.percentage}%</TableCell>
               </TableRow>)
             )}
           </TableBody>
