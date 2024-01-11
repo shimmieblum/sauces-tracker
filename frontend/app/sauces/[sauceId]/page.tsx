@@ -7,6 +7,8 @@ import {notFound} from "next/navigation";
 import {Box} from "@mui/material";
 import {NotFound} from "../../sharedComponents/NotFound";
 import {HeaderComponent} from "../../sharedComponents/header/HeaderComponent";
+import {SauceComponent} from "./SauceComponent";
+import {param} from "ts-interface-checker";
 
 interface SaucePageParams {
   params: {
@@ -16,17 +18,10 @@ interface SaucePageParams {
 
 
 export default function Sauce({ params }: SaucePageParams) {
-  return <>
-    <HeaderComponent/>
-    <SauceComponent sauceId={params.sauceId}/>
-  </>
-}
-
-const SauceComponent = ({sauceId}: {sauceId:string}) => {
   const [sauce, setSauce] = useState<SauceResponse | undefined>();
   const { getSauce, loading } = useGetSauce();
   useEffect(() => {
-    getSauce(sauceId).then(s => {
+    getSauce(params.sauceId).then(s => {
       if (s) setSauce(s)
     })}, []);
 
@@ -37,7 +32,9 @@ const SauceComponent = ({sauceId}: {sauceId:string}) => {
   if(!sauce) {
     return <NotFound> Sauce not found </NotFound>
   }
-
-  return <Box>My Sauce: {sauce.name}</Box>;
-
+  
+  return <>
+    <HeaderComponent/>
+    <SauceComponent sauce={sauce}/>
+  </>
 }
