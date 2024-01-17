@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.Json;
 using Sauces.Api.Models;
 using Sauces.Core;
 using Sauces.Core.Model;
@@ -12,7 +14,7 @@ public interface ISaucesRepository
     public Task<Guid?> CreateAsync(SauceRequest sauceRequest);
     public Task<Sauce?> GetAsync(Guid id);
     public Task<Sauce?> DeleteAsync(Guid id);
-    public Task<Sauce?> UpdateAsync(Guid id, SauceRequest request);
+    public Task<Sauce?> UpdateAsync(Guid id, SauceUpdateRequest request);
 }
 
 public class SauceRepository(SaucesContext dbContext) : ISaucesRepository
@@ -32,18 +34,30 @@ public class SauceRepository(SaucesContext dbContext) : ISaucesRepository
         await dbContext.SaveChangesAsync();
         return sauce;
     }
-    
-    public async Task<Sauce?> UpdateAsync(Guid id, SauceRequest request)
+
+    public async Task<Sauce?> UpdateAsync(Guid id, SauceUpdateRequest request)
     {
-        var found = await dbContext.Sauces.FindAsync(id);
-        if (found is null)
+        var ogSauce = await dbContext.Sauces
+            .IncludeEverything()
+            .FirstOrDefaultAsync(s => s.Id == id);
+        if (ogSauce is null)
             return null;
-        var replacement = await ToSauceAsync(request, id);
-        if (replacement is null)
-            return null;
-        dbContext.Entry(found).CurrentValues.SetValues(replacement);
+        ogSauce.Name = request.Name;
+        ogSauce.Notes = request.Notes;
+        ogSauce.LastUpdated = DateTime.Now;
+        if (ogSauce.Fermentation is FermentationRecipeAsIngredient recipeAsIngredient)
+        {
+            recipeAsIngredient.Percentage = request.FermentationPercentage;
+            if (recipeAsIngredient.FermentationRecipe is FermentationRecipe recipe)
+            {
+                recipe.Ingredients = request.FermentationRecipe.Ingredients.ToList();
+                recipe.LengthInDays = request.FermentationRecipe.LengthInDays;
+                recipe.LastUpdate = DateTime.Now;
+            }
+        }
+        ogSauce.NonFermentedIngredients = request.NonFermentedIngredients;
         await dbContext.SaveChangesAsync();
-        return replacement;
+        return await dbContext.Sauces.IncludeEverything().FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public async Task<Guid?> CreateAsync(SauceRequest sauceRequest)
@@ -56,6 +70,9 @@ public class SauceRepository(SaucesContext dbContext) : ISaucesRepository
         await dbContext.SaveChangesAsync();
         return id;
     }
+    
+    
+
 
     private async Task<Sauce?> ToSauceAsync(SauceRequest request, Guid id)
     {
@@ -75,13 +92,13 @@ public class SauceRepository(SaucesContext dbContext) : ISaucesRepository
                 FermentationRecipe = fermentation,
                 Percentage = request.FermentationPercentage
             },
-            NonFermentedIngredients = request.NonFermentedIngredients.Select(entry =>
+            NonFermentedIngredients = request.NonFermentedIngredients.Select(i =>
             {
-                var ingredient = dbContext.Ingredients.Find(entry.Ingredient)
-                                 ?? dbContext.Add(new Ingredient{Name = entry.Ingredient}).Entity;
+                var ingredient =  dbContext.Ingredients.Find(i.Ingredient)
+                                 ??  dbContext.Ingredients.Add(new() { Name = i.Ingredient }).Entity;
                 return new RecipeIngredient
                 {
-                    Ingredient = ingredient, Percentage = entry.Percentage
+                    Id = Guid.NewGuid(), Ingredient = ingredient, Percentage = i.Percentage
                 };
             }).ToList(),
             Notes = request.Notes

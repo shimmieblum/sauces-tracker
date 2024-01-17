@@ -15,6 +15,7 @@ public static class SauceHandlers
         app.MapPost("", PostHandler);
         app.MapPost("/with-fermentation", PostWithFermentationHandler);
         app.MapDelete("/{id:guid}", DeleteHandler);
+        app.MapPut("/{id:guid}", UpdateHandler);
 
         return app;
     }
@@ -26,6 +27,7 @@ public static class SauceHandlers
             Name = sauce.Name,
             Fermentation = new() 
             {
+                Id = sauce.Fermentation.Id,
                 Ingredients = sauce.Fermentation.FermentationRecipe.Ingredients
                     .Select(i => new IngredientsModel{
                         
@@ -90,6 +92,17 @@ public static class SauceHandlers
         };
         
         return await PostHandler(saucesRepository, sauceRequest);
+    }
+
+    private static async Task<IResult> UpdateHandler(
+        ISaucesRepository saucesRepository,
+        IFermentationRepository fermentationRepository,
+        [FromRoute] Guid id,
+        [FromBody] SauceUpdateRequest request)
+    {
+        var sauce = await saucesRepository.UpdateAsync(id, request);
+
+        return sauce is null ? NotFound() : Ok(sauce);
     }
 
     private static async Task<IResult> DeleteHandler(ISaucesRepository repository, [FromRoute] Guid id)

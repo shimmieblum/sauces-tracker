@@ -29,7 +29,11 @@ public class SauceResponse
     public DateTime Created { get; set; }
 }
 
-public class Fermentation {
+public class Fermentation 
+{
+    [JsonPropertyName("id")]
+    public Guid Id { get; set; }
+    
     [JsonPropertyName("ingredients")]
     public IngredientsModel[] Ingredients { get; set;}
 

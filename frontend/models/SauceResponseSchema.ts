@@ -2,6 +2,7 @@ import {z} from 'zod'
 import {IngredientSchema} from "./IngredientSchema";
 
 export const FermentationResponseSchema = z.object({
+  id: z.string(),
   ingredients: z.array(IngredientSchema),
   lengthInDays: z.number(),
 });
