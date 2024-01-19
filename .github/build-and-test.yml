@@ -1,0 +1,30 @@
+name: Build & Test
+on: 
+  pull_request:
+    paths:
+      - 'backend/**'
+    branches: 
+      - main
+    
+    
+jobs: 
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps: 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x'
+      - name: Install dependencies
+        run: dotnet restore ./backend
+      
+      - name: Build
+        run: dotnet build ./backend
+      
+      - name: Test
+        run: dotnet ./backend/test/Sauces.Api.Tests
+        
