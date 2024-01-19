@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start-backend": "dotnet run --project ./backend/src/Sauces.Api",
-    "start-frontend": "yarn --cwd frontend dev"
+    "backend:dev": "dotnet run --project ./backend/src/Sauces.Api",
+    "backend:test": "dotnet test ./backend/test/Sauces.Api.Tests",
+    "frontend:dev": "yarn --cwd frontend dev"
   }
-}
+}gc

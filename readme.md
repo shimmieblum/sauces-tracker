@@ -13,8 +13,10 @@ The purpose of the project is to be able to record, view and update Hot Sauce re
 
 ## Get Started
 from root:
-* Backend: `yarn start-backend`
-* Frontend: `yarn start-frontend`
+* Backend: `yarn backend:dev`
+* Frontend: `yarn frontend:dev`
+* run tests: `yarn backend:test`
+* 
 
 
 ## Future
