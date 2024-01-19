@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "start-backend": "dotnet run --project ./backend/src/Sauces.Api",
+    "start-frontend": "yarn --cwd frontend dev"
+  }
+}
