@@ -12,9 +12,9 @@ The purpose of the project is to be able to record, view and update Hot Sauce re
 * Managed with Yarn
 
 ## Get Started
-
-Backend: `dotnet run --project ./backend/src/Sauces.Api`
-Frontend: `cd ./frontent; yarn dev`
+from root:
+* Backend: `yarn start-backend`
+* Frontend: `yarn start-frontend`
 
 
 ## Future
