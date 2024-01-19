@@ -26,5 +26,5 @@ jobs:
         run: dotnet build ./backend
       
       - name: Test
-        run: dotnet ./backend/test/Sauces.Api.Tests
+        run: dotnet ./backend
         
