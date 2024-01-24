@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Connections;
 using Sauces.Api.Models;
 using Sauces.Api.Repositories;
 using Sauces.Api.Tests.FixturesAndUtils;
@@ -54,6 +55,32 @@ public class FermentationRecipeRepositoryTests
             })
             .Should().BeEquivalentTo(request.Ingredients);
         recipe?.Id.Should().Be(id.Value);
+    }
+
+    [Test]
+    public async Task UpdateFermentation_WithNoChange_ChangesNothing()
+    {
+        var recipe = _fixture.Recipe;
+        var request = new FermentationRecipeUpdateRequestBuilder().FromFermentationRecipe(recipe).Build();
+        var sut = GetSut();
+        await sut.UpdateAsync(recipe.Id, request);
+        var updatedRecipe = await sut.GetAsync(recipe.Id);
+        updatedRecipe.Should().BeEquivalentTo(recipe);
+    }
+
+    [Test]
+    public async Task UpdateFermentation_WithChange_ShouldUpdate()
+    {
+        var recipe = _fixture.Recipe;
+        var updatedDays = recipe.LengthInDays + 10;
+        var request = new FermentationRecipeUpdateRequestBuilder().FromFermentationRecipe(recipe)
+            .WithLengthInDays(updatedDays).Build();
+        var sut = GetSut();
+        await sut.UpdateAsync(recipe.Id, request);
+        var updatedRecipe = await sut.GetAsync(recipe.Id);
+        updatedRecipe.Should().NotBeNull();
+        updatedRecipe?.LastUpdate.Should().BeAfter(recipe.LastUpdate);
+        updatedRecipe?.LengthInDays.Should().Be(updatedDays);
     }
     
     
