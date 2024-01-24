@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
-using Sauces.Core.Model;
 
-namespace Sauces.Api.Models;
+namespace Sauces.Api.Models.Requests;
 
 public class SauceUpdateRequest
 {
@@ -12,7 +11,7 @@ public class SauceUpdateRequest
     public FermentationRecipeUpdateRequest FermentationRecipe { get; set; }
     
     [JsonPropertyName("nonFermentedIngredients")]
-    public List<RecipeIngredient> NonFermentedIngredients { get; set; }
+    public List<IngredientModel> NonFermentedIngredients { get; set; }
     
     [JsonPropertyName("fermentationPercentage")]
     public int FermentationPercentage { get; set; }
@@ -22,12 +21,9 @@ public class SauceUpdateRequest
 }
 
 public class FermentationRecipeUpdateRequest
-{
-    [JsonPropertyName("id")]
-    public Guid Id { get; set; }
-    
+{   
     [JsonPropertyName("ingredients")]
-    public RecipeIngredient[] Ingredients { get; set; }
+    public List<IngredientModel> Ingredients { get; set; }
     
     [JsonPropertyName("lengthInDays")]
     public int LengthInDays { get; set; }

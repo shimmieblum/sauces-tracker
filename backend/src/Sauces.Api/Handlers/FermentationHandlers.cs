@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Sauces.Api.Models;
+using Sauces.Api.Models.ExtensionsAndUtils;
+using Sauces.Api.Models.Requests;
 using Sauces.Api.Repositories;
-using Sauces.Core.Model;
 using static Microsoft.AspNetCore.Http.Results;
 
 namespace Sauces.Api.Handlers;
@@ -13,23 +13,9 @@ public static class FermentationHandlers
         app.MapPost("", PostFermentationHandler);
         app.MapGet("", GetFermentationsHandler);
         app.MapGet("/{id:guid}", GetFermentationHandler);
-        
+        app.MapPut("/{id:guid}", UpdateFermentationHandler);
         return app;
     }
-
-    private static FermentationRecipeResponse ToResponse(this FermentationRecipe recipe)
-        => new()
-        {
-            Id = recipe.Id,
-            Ingredients = recipe.Ingredients.Select(i => new IngredientsModel
-            {
-                Ingredient = i.Ingredient.Name, Percentage = i.Percentage
-            }).ToArray(),
-            LengthInDays = recipe.LengthInDays,
-            LastUpdated = recipe.LastUpdate,
-            Created = recipe.Created
-        };
-
     private static async Task<IResult> PostFermentationHandler(
         IFermentationRepository fermentationRepository, 
         [FromBody] FermentationRecipeRequest fermentationRecipeRequest)
@@ -53,5 +39,16 @@ public static class FermentationHandlers
         return recipe is null 
             ? NotFound($"No Fermentation with id {id} found") 
             : Ok(recipe.ToResponse());
+    }
+
+    private static async Task<IResult> UpdateFermentationHandler(
+        IFermentationRepository fermentationRepository,
+        [FromRoute] Guid id,
+        [FromBody] FermentationRecipeUpdateRequest request)
+    {
+        var updated = await fermentationRepository.UpdateAsync(id, request);
+        return updated is null
+            ? NotFound($"Update of fermentation failed")
+            : Ok(updated.ToResponse());
     }
 }

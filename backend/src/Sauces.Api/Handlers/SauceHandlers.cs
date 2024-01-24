@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Sauces.Api.Models;
+using Sauces.Api.Models.ExtensionsAndUtils;
+using Sauces.Api.Models.Requests;
 using Sauces.Api.Repositories;
-using Sauces.Core.Model;
 using static Microsoft.AspNetCore.Http.Results;
 
 namespace Sauces.Api.Handlers;
@@ -19,34 +19,7 @@ public static class SauceHandlers
 
         return app;
     }
-
-    private static SauceResponse ToSauceResponse(this Sauce sauce) =>
-        new()
-        {
-            Id = sauce.Id,
-            Name = sauce.Name,
-            Fermentation = new() 
-            {
-                Id = sauce.Fermentation.Id,
-                Ingredients = sauce.Fermentation.FermentationRecipe.Ingredients
-                    .Select(i => new IngredientsModel{
-                        
-                            Ingredient = i.Ingredient.Name, Percentage = i.Percentage
-                    }).ToArray(),
-                lengthInDays  = sauce.Fermentation.FermentationRecipe.LengthInDays
-            },
-            FermentationPercentage = sauce.Fermentation.Percentage,
-            NonFermentedIngredients =
-                sauce.NonFermentedIngredients.Select( i => new IngredientsModel
-                {
-                    Ingredient = i.Ingredient.Name,
-                    Percentage = i.Percentage
-                }).ToArray(),
-            Notes = sauce.Notes,
-            Created = sauce.Created,
-            LastUpdated = sauce.LastUpdated
-        };
-
+    
     private static async Task<IResult> GetAllHandler(ISaucesRepository saucesRepository)
     {
         var sauces = await saucesRepository.GetAsync();

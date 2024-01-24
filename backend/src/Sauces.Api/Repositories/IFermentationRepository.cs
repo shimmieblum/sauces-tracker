@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Sauces.Core;
+using Sauces.Api.Models.ExtensionsAndUtils;
+using Sauces.Api.Models.Requests;
 using Sauces.Core.Model;
 
 namespace Sauces.Api.Repositories;
@@ -13,23 +14,24 @@ public interface IFermentationRepository
 
     public Task<FermentationRecipe?> DeleteAsync(Guid id);
 
-    public Task<FermentationRecipe?> UpdateAsync(Guid id, FermentationRecipeRequest request);
+    public Task<FermentationRecipe?> UpdateAsync(Guid id, FermentationRecipeUpdateRequest request);
 }
 
 
-public class FermentationRepository(SaucesContext dbContext) : IFermentationRepository
+public class FermentationRepository(SaucesContext dbContext) 
+    : SaucesDbRepoBase( dbContext), IFermentationRepository
 {
     public async Task<List<FermentationRecipe>> GetAsync()
-        => await dbContext.FermentationRecipes.IncludeEverything().ToListAsync();
+        => await DbContext.FermentationRecipes.IncludeEverything().ToListAsync();
     
     public async Task<FermentationRecipe?> GetAsync(Guid id)
-        => await dbContext.FermentationRecipes.IncludeEverything().FirstOrDefaultAsync(r => r.Id == id);
+        => await DbContext.FermentationRecipes.IncludeEverything().FirstOrDefaultAsync(r => r.Id == id);
 
     public async Task<Guid?> CreateAsync(FermentationRecipeRequest fermentationRecipeRequest)
     {
         var id = Guid.NewGuid();
-        await dbContext.FermentationRecipes.AddAsync(ToRecipe(fermentationRecipeRequest, id));
-        await dbContext.SaveChangesAsync();
+        await DbContext.FermentationRecipes.AddAsync(ToRecipe(fermentationRecipeRequest, id));
+        await DbContext.SaveChangesAsync();
         return id;
     }
 
@@ -37,20 +39,25 @@ public class FermentationRepository(SaucesContext dbContext) : IFermentationRepo
     {
         var recipe = await GetAsync(id);
         if (recipe is null) return null;
-        dbContext.FermentationRecipes.Remove(recipe);
-        await dbContext.SaveChangesAsync();
+        DbContext.FermentationRecipes.Remove(recipe);
+        await DbContext.SaveChangesAsync();
         return recipe;
     }
 
-    public async Task<FermentationRecipe?> UpdateAsync(Guid id, FermentationRecipeRequest request)
+    public async Task<FermentationRecipe?> UpdateAsync(Guid id, FermentationRecipeUpdateRequest request )
     {
-        var found = await GetAsync(id);
-        if (found is null)
-            return null;
-        var replacement = ToRecipe(request, id);
-        dbContext.Entry(found).CurrentValues.SetValues(replacement);
-        await dbContext.SaveChangesAsync();
-        return replacement;
+        var recipe = await GetAsync(id);
+        if (recipe is null || recipe.IsEquivalentTo(request))
+        {
+            return recipe;
+        }
+
+        if (recipe.LengthInDays != request.LengthInDays) recipe.LengthInDays = request.LengthInDays;
+        if (recipe.Ingredients.IngredientsDiffer(request.Ingredients)) 
+            recipe.Ingredients = request.Ingredients.Select(AsRecipeIngredient).ToList();
+        recipe.LastUpdate = DateTime.Now;
+
+        return recipe;
     }
 
     
@@ -58,8 +65,8 @@ public class FermentationRepository(SaucesContext dbContext) : IFermentationRepo
     {
         var ingredients = request.Ingredients.Select(entry =>
         {
-            var ingredient = dbContext.Ingredients.Find(entry.Ingredient)
-                             ?? dbContext.Ingredients.Add(new Ingredient{Name = entry.Ingredient}).Entity;
+            var ingredient = DbContext.Ingredients.Find(entry.Ingredient)
+                             ?? DbContext.Ingredients.Add(new Ingredient{Name = entry.Ingredient}).Entity;
             return new RecipeIngredient{ Ingredient = ingredient, Percentage = entry.Percentage};
         }).ToList();
 
