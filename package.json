@@ -4,4 +4,4 @@
     "backend:test": "dotnet test ./backend/test/Sauces.Api.Tests",
     "frontend:dev": "yarn --cwd frontend dev"
   }
-}gc
+}
