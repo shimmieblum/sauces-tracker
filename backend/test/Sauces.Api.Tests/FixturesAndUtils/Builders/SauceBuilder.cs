@@ -1,7 +1,6 @@
-using Sauces.Api.Models;
 using Sauces.Core.Model;
 
-namespace Sauces.Api.Tests.FixturesAndUtils;
+namespace Sauces.Api.Tests.FixturesAndUtils.Builders;
 
 public class SauceBuilder
 {
@@ -19,7 +18,7 @@ public class SauceBuilder
         _created = DateTime.Now; 
         _lastUpdated = DateTime.Now;
         _name = "name";
-        _fermentation = new() { Id = Guid.NewGuid() };
+        _fermentation = new() { Id = Guid.NewGuid(), FermentationRecipe = new FermentationRecipeBuilder().FromDefault().Build(), Percentage = 100};
         var ingredientName = Guid.NewGuid().ToString();
         _otherIngredients =
         [
@@ -60,16 +59,38 @@ public class SauceBuilder
          return this;
      }
     
-    public SauceBuilder WithOtherIngredients( params RecipeIngredient[] otherIngredients){
+    public SauceBuilder WithOtherIngredients( params RecipeIngredient[] otherIngredients)
+    {
         _otherIngredients = otherIngredients.ToList();
         return this;
     }
     
-     public SauceBuilder WithNotes ( string notes){
+     public SauceBuilder WithNotes ( string notes)
+     {
          _notes = notes;
          return this;
      }
 
+     public SauceBuilder DeepCopySauce(Sauce sauce)
+     {
+         _id = sauce.Id;
+         _created = sauce.Created;
+         _name = sauce.Name;
+         _lastUpdated = sauce.LastUpdated;
+         _fermentation = new FermentationRecipeAsIngredient()
+         {
+             Id = sauce.Fermentation.Id,
+             Percentage = sauce.Fermentation.Percentage,
+             FermentationRecipe = new FermentationRecipeBuilder().DeepCopyRecipe(sauce.Fermentation.FermentationRecipe).Build(),
+         };
+         _otherIngredients = sauce.NonFermentedIngredients.Select(i => new RecipeIngredient
+         {
+             Id = i.Id, Percentage = i.Percentage, Ingredient = new Ingredient { Name = i.Ingredient.Name }
+         }).ToList();
+         _notes = sauce.Notes;
+
+         return this;
+     }
 
      public Sauce Build() => new()
      {

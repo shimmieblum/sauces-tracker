@@ -1,12 +1,13 @@
 using Sauces.Api.Models;
+using Sauces.Api.Models.Requests;
 
-namespace Sauces.Api.Tests;
+namespace Sauces.Api.Tests.FixturesAndUtils.Builders;
 
 public class SauceRequestBuilder
 {
     private Guid _fermentationId;
     private int _fermentationPercentage;
-    private List<IngredientsModel> _otherIngredients;
+    private List<IngredientModel> _otherIngredients;
     private string _name;
     private string _notes;
 
@@ -15,7 +16,7 @@ public class SauceRequestBuilder
         _fermentationId = Guid.NewGuid();
         _fermentationPercentage = 100;
         var ingredient = Guid.NewGuid().ToString();
-        _otherIngredients = [new IngredientsModel { Ingredient = ingredient, Percentage = 100 }];
+        _otherIngredients = [new IngredientModel { Ingredient = ingredient, Percentage = 100 }];
         _name = "name";
         _notes = "notes";
 
@@ -34,7 +35,7 @@ public class SauceRequestBuilder
         return this;
     }
 
-    public SauceRequestBuilder WithIngredients(params IngredientsModel[] ingredientsModels)
+    public SauceRequestBuilder WithIngredients(params IngredientModel[] ingredientsModels)
     {
         _otherIngredients = ingredientsModels.ToList();
         return this;
