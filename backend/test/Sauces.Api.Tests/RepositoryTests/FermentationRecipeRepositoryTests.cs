@@ -2,8 +2,9 @@ using FluentAssertions;
 using Sauces.Api.Models;
 using Sauces.Api.Repositories;
 using Sauces.Api.Tests.FixturesAndUtils;
+using Sauces.Api.Tests.FixturesAndUtils.Builders;
 
-namespace Sauces.Api.Tests;
+namespace Sauces.Api.Tests.RepositoryTests;
 
 
 [TestFixture]
@@ -21,7 +22,7 @@ public class FermentationRecipeRepositoryTests
     [Test]
     public async Task GetFermentation_ReturnsExpectedEntry_WhenExists()
     {
-        var exRecipe = _fixture.Recipe1;
+        var exRecipe = _fixture.Recipe;
         var sut = GetSut();
         var recipe = await sut.GetAsync(exRecipe.Id);
         recipe.Should().BeEquivalentTo(exRecipe);
@@ -47,7 +48,7 @@ public class FermentationRecipeRepositoryTests
         var recipe = await sut.GetAsync(id.Value);
         recipe.Should().NotBeNull();
         recipe?.LengthInDays.Should().Be(request.LengthInDays);
-        recipe?.Ingredients.Select(i => new IngredientsModel
+        recipe?.Ingredients.Select(i => new IngredientModel
             {
                 Ingredient = i.Ingredient.Name, Percentage = i.Percentage
             })
