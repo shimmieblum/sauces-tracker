@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Sauces.Api.Handlers;
 using Sauces.Api.Repositories;
-using Sauces.Core;
 using Serilog;
 
 var builder = WebApplication

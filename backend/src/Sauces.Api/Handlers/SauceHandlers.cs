@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Sauces.Api.Models;
+using Sauces.Api.Models.ExtensionsAndUtils;
+using Sauces.Api.Models.Requests;
 using Sauces.Api.Repositories;
-using Sauces.Core.Model;
 using static Microsoft.AspNetCore.Http.Results;
 
 namespace Sauces.Api.Handlers;
@@ -15,36 +15,11 @@ public static class SauceHandlers
         app.MapPost("", PostHandler);
         app.MapPost("/with-fermentation", PostWithFermentationHandler);
         app.MapDelete("/{id:guid}", DeleteHandler);
+        app.MapPut("/{id:guid}", UpdateHandler);
 
         return app;
     }
-
-    private static SauceResponse ToSauceResponse(this Sauce sauce) =>
-        new()
-        {
-            Id = sauce.Id,
-            Name = sauce.Name,
-            Fermentation = new() 
-            {
-                Ingredients = sauce.Fermentation.FermentationRecipe.Ingredients
-                    .Select(i => new IngredientsModel{
-                        
-                            Ingredient = i.Ingredient.Name, Percentage = i.Percentage
-                    }).ToArray(),
-                lengthInDays  = sauce.Fermentation.FermentationRecipe.LengthInDays
-            },
-            FermentationPercentage = sauce.Fermentation.Percentage,
-            NonFermentedIngredients =
-                sauce.NonFermentedIngredients.Select( i => new IngredientsModel
-                {
-                    Ingredient = i.Ingredient.Name,
-                    Percentage = i.Percentage
-                }).ToArray(),
-            Notes = sauce.Notes,
-            Created = sauce.Created,
-            LastUpdated = sauce.LastUpdated
-        };
-
+    
     private static async Task<IResult> GetAllHandler(ISaucesRepository saucesRepository)
     {
         var sauces = await saucesRepository.GetAsync();
@@ -90,6 +65,17 @@ public static class SauceHandlers
         };
         
         return await PostHandler(saucesRepository, sauceRequest);
+    }
+
+    private static async Task<IResult> UpdateHandler(
+        ISaucesRepository saucesRepository,
+        IFermentationRepository fermentationRepository,
+        [FromRoute] Guid id,
+        [FromBody] SauceUpdateRequest request)
+    {
+        var sauce = await saucesRepository.UpdateAsync(id, request);
+
+        return sauce is null ? NotFound() : Ok(sauce);
     }
 
     private static async Task<IResult> DeleteHandler(ISaucesRepository repository, [FromRoute] Guid id)

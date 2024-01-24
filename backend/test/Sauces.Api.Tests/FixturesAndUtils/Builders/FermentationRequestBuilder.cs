@@ -1,12 +1,13 @@
 
 using Sauces.Api.Models;
+using Sauces.Api.Models.Requests;
 
-namespace Sauces.Api.Tests;
+namespace Sauces.Api.Tests.FixturesAndUtils.Builders;
 
 public class FermentationRequestBuilder
 {
     private int _lengthInDays;
-    private List<IngredientsModel> _ingredients;
+    private List<IngredientModel> _ingredients;
 
     public FermentationRequestBuilder WithLengthInDays(int length)
     {
@@ -14,7 +15,7 @@ public class FermentationRequestBuilder
         return this;
     }
 
-    public FermentationRequestBuilder WithIngredients(params IngredientsModel[] ingredients)
+    public FermentationRequestBuilder WithIngredients(params IngredientModel[] ingredients)
     {
         _ingredients = ingredients.ToList();
         return this;
@@ -23,7 +24,7 @@ public class FermentationRequestBuilder
     public FermentationRequestBuilder FromDefault()
     {
         _lengthInDays = 30;
-        _ingredients = [new IngredientsModel { Ingredient = Guid.NewGuid().ToString(), Percentage = 100 }];
+        _ingredients = [new IngredientModel { Ingredient = Guid.NewGuid().ToString(), Percentage = 100 }];
         return this;
     }
 

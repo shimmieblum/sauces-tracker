@@ -1,40 +1,44 @@
 using Microsoft.EntityFrameworkCore;
-using Sauces.Core;
+using Sauces.Api.Models.ExtensionsAndUtils;
+using Sauces.Api.Repositories;
+using Sauces.Api.Tests.FixturesAndUtils.Builders;
 using Sauces.Core.Model;
 
 namespace Sauces.Api.Tests.FixturesAndUtils;
 
 public class SaucesContextFixture
 {
-    public SaucesContext Context { get; init; }
-    public const string Name = "TestSauce";
-    public FermentationRecipe Recipe1 { get; private set; }
-    public FermentationRecipe Recipe2 { get; private set; }
-    public FermentationRecipe Recipe3 { get; private set; }
-    public Sauce Sauce1 { get; private set; }
-    public Sauce Sauce2 { get; private set; }
-    public Sauce Sauce3 { get; private set; }
+    public SaucesContext Context { get; }
+    private const string Name = "TestSauce";
+    public readonly Guid RecipeId = Guid.NewGuid();
 
+    public FermentationRecipe Recipe => 
+        Context.FermentationRecipes.IncludeEverything().AsNoTracking().FirstOrDefault(s => s.Id == RecipeId) 
+        ?? throw new Exception("error getting sauce in fixture");
+
+    public readonly Guid SauceId = Guid.NewGuid();
+    public Sauce Sauce => 
+        Context.Sauces.IncludeEverything().AsNoTracking().FirstOrDefault(s => s.Id == SauceId)
+        ?? throw new Exception("error getting sauce in fixture");
+   
     public SaucesContextFixture()
     {
-        var options = new DbContextOptionsBuilder<SaucesContext>().UseInMemoryDatabase(Name).Options;
+        var options = new DbContextOptionsBuilder<SaucesContext>()
+            .UseInMemoryDatabase(Name)
+            .EnableSensitiveDataLogging()
+            .Options;
         Context = new SaucesContext(options);
         InitialiseDbEntries();
     }
 
     private void InitialiseDbEntries()
     {
-        Recipe1 = new FermentationRecipeBuilder().FromDefault().Build();
-        Recipe2 = new FermentationRecipeBuilder().FromDefault().Build();
-        Recipe3 = new FermentationRecipeBuilder().FromDefault().Build();
-
-        Sauce1 = new SauceBuilder().FromDefault().WithFermentationRecipe(Recipe1).Build();
-        Sauce2 = new SauceBuilder().FromDefault().WithFermentationRecipe(Recipe2).Build();
-        Sauce3 = new SauceBuilder().FromDefault().WithFermentationRecipe(Recipe3).Build();
-        
-        Context.Sauces.AddRange(Sauce1, Sauce2, Sauce3);
-        Context.FermentationRecipes.AddRange(Recipe1, Recipe2, Recipe3);
+        var recipe = new FermentationRecipeBuilder().FromDefault().WithId(RecipeId).Build();
+        var sauce = new SauceBuilder().FromDefault().WithId(SauceId).WithFermentationRecipe(recipe).Build();
+        Context.Sauces.Add(sauce);
+        Context.FermentationRecipes.Add(recipe);
         Context.SaveChanges();
     }
+
     
 }

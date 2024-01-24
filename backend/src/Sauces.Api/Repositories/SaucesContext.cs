@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sauces.Core.Model;
 
-namespace Sauces.Core;
+namespace Sauces.Api.Repositories;
 
 public class SaucesContext : DbContext
 {

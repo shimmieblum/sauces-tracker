@@ -1,9 +1,11 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Connections;
 using Sauces.Api.Models;
 using Sauces.Api.Repositories;
 using Sauces.Api.Tests.FixturesAndUtils;
+using Sauces.Api.Tests.FixturesAndUtils.Builders;
 
-namespace Sauces.Api.Tests;
+namespace Sauces.Api.Tests.RepositoryTests;
 
 
 [TestFixture]
@@ -21,7 +23,7 @@ public class FermentationRecipeRepositoryTests
     [Test]
     public async Task GetFermentation_ReturnsExpectedEntry_WhenExists()
     {
-        var exRecipe = _fixture.Recipe1;
+        var exRecipe = _fixture.Recipe;
         var sut = GetSut();
         var recipe = await sut.GetAsync(exRecipe.Id);
         recipe.Should().BeEquivalentTo(exRecipe);
@@ -47,12 +49,38 @@ public class FermentationRecipeRepositoryTests
         var recipe = await sut.GetAsync(id.Value);
         recipe.Should().NotBeNull();
         recipe?.LengthInDays.Should().Be(request.LengthInDays);
-        recipe?.Ingredients.Select(i => new IngredientsModel
+        recipe?.Ingredients.Select(i => new IngredientModel
             {
                 Ingredient = i.Ingredient.Name, Percentage = i.Percentage
             })
             .Should().BeEquivalentTo(request.Ingredients);
         recipe?.Id.Should().Be(id.Value);
+    }
+
+    [Test]
+    public async Task UpdateFermentation_WithNoChange_ChangesNothing()
+    {
+        var recipe = _fixture.Recipe;
+        var request = new FermentationRecipeUpdateRequestBuilder().FromFermentationRecipe(recipe).Build();
+        var sut = GetSut();
+        await sut.UpdateAsync(recipe.Id, request);
+        var updatedRecipe = await sut.GetAsync(recipe.Id);
+        updatedRecipe.Should().BeEquivalentTo(recipe);
+    }
+
+    [Test]
+    public async Task UpdateFermentation_WithChange_ShouldUpdate()
+    {
+        var recipe = _fixture.Recipe;
+        var updatedDays = recipe.LengthInDays + 10;
+        var request = new FermentationRecipeUpdateRequestBuilder().FromFermentationRecipe(recipe)
+            .WithLengthInDays(updatedDays).Build();
+        var sut = GetSut();
+        await sut.UpdateAsync(recipe.Id, request);
+        var updatedRecipe = await sut.GetAsync(recipe.Id);
+        updatedRecipe.Should().NotBeNull();
+        updatedRecipe?.LastUpdate.Should().BeAfter(recipe.LastUpdate);
+        updatedRecipe?.LengthInDays.Should().Be(updatedDays);
     }
     
     

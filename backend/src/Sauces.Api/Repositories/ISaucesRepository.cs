@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Sauces.Api.Models;
-using Sauces.Core;
+using Sauces.Api.Models.ExtensionsAndUtils;
+using Sauces.Api.Models.Requests;
 using Sauces.Core.Model;
 
 namespace Sauces.Api.Repositories;
@@ -12,54 +12,94 @@ public interface ISaucesRepository
     public Task<Guid?> CreateAsync(SauceRequest sauceRequest);
     public Task<Sauce?> GetAsync(Guid id);
     public Task<Sauce?> DeleteAsync(Guid id);
-    public Task<Sauce?> UpdateAsync(Guid id, SauceRequest request);
+    public Task<Sauce?> UpdateAsync(Guid id, SauceUpdateRequest request);
 }
 
-public class SauceRepository(SaucesContext dbContext) : ISaucesRepository
+public class SauceRepository(SaucesContext dbContext) 
+    : SaucesDbRepoBase(dbContext), ISaucesRepository
 {
     public async Task<List<Sauce>> GetAsync()
-        =>  await dbContext.Sauces.IncludeEverything().ToListAsync();
+        =>  await DbContext.Sauces.IncludeEverything().ToListAsync();
     
     public async Task<Sauce?> GetAsync(Guid id)
-        => await dbContext.Sauces.IncludeEverything().FirstOrDefaultAsync(s => s.Id == id);
+        => await DbContext.Sauces.IncludeEverything().FirstOrDefaultAsync(s => s.Id == id);
 
     public async Task<Sauce?> DeleteAsync(Guid id)
     {
         var sauce = await GetAsync(id);
         if (sauce is null)
             return null;
-        dbContext.Sauces.Remove(sauce);
-        await dbContext.SaveChangesAsync();
+        DbContext.Sauces.Remove(sauce);
+        await DbContext.SaveChangesAsync();
         return sauce;
     }
-    
-    public async Task<Sauce?> UpdateAsync(Guid id, SauceRequest request)
+
+    public async Task<Sauce?> UpdateAsync(Guid id, SauceUpdateRequest request)
     {
-        var found = await dbContext.Sauces.FindAsync(id);
-        if (found is null)
+        var sauce = await DbContext.Sauces
+            .IncludeEverything()
+            .FirstOrDefaultAsync(s => s.Id == id);
+        if (sauce is null)
             return null;
-        var replacement = await ToSauceAsync(request, id);
-        if (replacement is null)
-            return null;
-        dbContext.Entry(found).CurrentValues.SetValues(replacement);
-        await dbContext.SaveChangesAsync();
-        return replacement;
+
+        if (sauce.IsEquivalentTo(request))
+        {
+            return sauce;
+        }
+
+        UpdateSauceDetails(sauce, request);
+        UpdateFermentationRecipeDetails(sauce.Fermentation, request);
+        
+        await DbContext.SaveChangesAsync();
+        return sauce;
     }
 
+    private Sauce UpdateSauceDetails(Sauce sauce, SauceUpdateRequest request)
+    {
+        if (sauce.IsEquivalentTo(request))
+        {
+            return sauce;
+        }
+
+        if (sauce.Name != request.Name) sauce.Name = request.Name;
+        if (sauce.Notes != request.Notes) sauce.Notes = request.Notes;
+        if (sauce.NonFermentedIngredients.IngredientsDiffer(request.NonFermentedIngredients))
+            sauce.NonFermentedIngredients = request.NonFermentedIngredients.Select(AsRecipeIngredient).ToList();
+        sauce.LastUpdated = DateTime.Now;
+        return sauce;
+    }
+
+    private FermentationRecipeAsIngredient UpdateFermentationRecipeDetails(FermentationRecipeAsIngredient recipeAsIngredient, SauceUpdateRequest request)
+    {
+        if (recipeAsIngredient.IsEquivalentTo(request.FermentationRecipe, request.FermentationPercentage))
+        {
+            return recipeAsIngredient;
+        }
+        var recipe = recipeAsIngredient.FermentationRecipe;
+        if (recipeAsIngredient.Percentage != request.FermentationPercentage) recipeAsIngredient.Percentage = request.FermentationPercentage;
+        if (recipe.LengthInDays != request.FermentationRecipe.LengthInDays)
+            recipe.LengthInDays = request.FermentationRecipe.LengthInDays;
+        if (recipe.Ingredients.IngredientsDiffer(request.FermentationRecipe.Ingredients))
+            recipe.Ingredients = request.FermentationRecipe.Ingredients.Select(AsRecipeIngredient).ToList();
+        recipe.LastUpdate = DateTime.Now;
+
+        return recipeAsIngredient;
+    }
+    
     public async Task<Guid?> CreateAsync(SauceRequest sauceRequest)
     {
         var id = Guid.NewGuid();
         var sauce = await ToSauceAsync(sauceRequest, id);
         if (sauce is null) 
             return null;
-        await dbContext.Sauces.AddAsync(sauce);
-        await dbContext.SaveChangesAsync();
+        await DbContext.Sauces.AddAsync(sauce);
+        await DbContext.SaveChangesAsync();
         return id;
     }
 
     private async Task<Sauce?> ToSauceAsync(SauceRequest request, Guid id)
     {
-        var fermentation = await dbContext.FermentationRecipes
+        var fermentation = await DbContext.FermentationRecipes
             .IncludeEverything()
             .FirstOrDefaultAsync(f => f.Id == request.Fermentation);
         
@@ -75,13 +115,12 @@ public class SauceRepository(SaucesContext dbContext) : ISaucesRepository
                 FermentationRecipe = fermentation,
                 Percentage = request.FermentationPercentage
             },
-            NonFermentedIngredients = request.NonFermentedIngredients.Select(entry =>
+            NonFermentedIngredients = request.NonFermentedIngredients.Select(i =>
             {
-                var ingredient = dbContext.Ingredients.Find(entry.Ingredient)
-                                 ?? dbContext.Add(new Ingredient{Name = entry.Ingredient}).Entity;
+                var ingredient = EnsureIngredient(i.Ingredient);
                 return new RecipeIngredient
                 {
-                    Ingredient = ingredient, Percentage = entry.Percentage
+                    Id = Guid.NewGuid(), Ingredient = ingredient, Percentage = i.Percentage
                 };
             }).ToList(),
             Notes = request.Notes

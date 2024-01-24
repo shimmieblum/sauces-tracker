@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Sauces.Api.Models;
+namespace Sauces.Api.Models.Requests;
 
 public class SauceWithFermentationRequest
 {
@@ -15,7 +15,7 @@ public class SauceWithFermentationRequest
     public int FermentationPercentage { get; set; }
     
     [JsonPropertyName("nonFermentedIngredients")]
-    public List<IngredientsModel> NonFermentedIngredients { get; set; }
+    public List<IngredientModel> NonFermentedIngredients { get; set; }
     
     [JsonPropertyName("notes")]
     public string Notes { get; set; }

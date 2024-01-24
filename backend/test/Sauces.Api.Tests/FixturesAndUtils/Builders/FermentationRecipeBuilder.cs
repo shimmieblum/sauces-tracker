@@ -1,6 +1,6 @@
 using Sauces.Core.Model;
 
-namespace Sauces.Api.Tests.FixturesAndUtils;
+namespace Sauces.Api.Tests.FixturesAndUtils.Builders;
 
 public class FermentationRecipeBuilder
 {
@@ -60,6 +60,23 @@ public class FermentationRecipeBuilder
         return this;
     }
     
+    
+    public FermentationRecipeBuilder DeepCopyRecipe(FermentationRecipe recipe)
+    {
+        _created = recipe.Created;
+        _id = recipe.Id;
+        _recipeIngredients = recipe.Ingredients
+            .Select(i => new RecipeIngredient
+            {
+                Id = i.Id, Ingredient = new Ingredient { Name = i.Ingredient.Name }, Percentage = i.Percentage
+            })
+            .ToList();
+        _lastUpdated = recipe.LastUpdate;
+        _lengthInDays = recipe.LengthInDays;
+
+        return this;
+    }
+    
     public FermentationRecipe Build() => new FermentationRecipe
     {
         Created = _created,
@@ -68,4 +85,5 @@ public class FermentationRecipeBuilder
         LastUpdate = _lastUpdated,
         LengthInDays = _lengthInDays
     };
+
 }
