@@ -76,6 +76,4 @@ public static class ModelExtensions
     public static IQueryable<FermentationRecipe> IncludeEverything(this DbSet<FermentationRecipe> fermentationRecipes)
         => fermentationRecipes
             .Include(r => r.Ingredients).ThenInclude(i => i.Ingredient);
-
-
 }
